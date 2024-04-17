@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-suspend
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Allow
+  suspend: true
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - name: cronjob-suspend
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo "Hello World!"
+          restartPolicy: OnFailure

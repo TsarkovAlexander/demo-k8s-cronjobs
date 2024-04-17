@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-timezone
+spec:
+  schedule: "*/1 * * * *"
+  timeZone: "Europe/Warsaw"
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cronjob-timezone
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo "Hello World!"; sleep 140
+          restartPolicy: OnFailure

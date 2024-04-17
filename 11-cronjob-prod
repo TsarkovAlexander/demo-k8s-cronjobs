@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job-trxs-upload
+spec:
+  schedule: "0 0 * * *"
+  timeZone: "Europe/Zurich"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - name: job-trxs-upload
+            image: backoffice-cron
+            volumeMounts:
+              - name: config 
+                mountPath: /bo-cron/config
+              - name: secret
+                mountPath: /bo-cron/secret
+              - name: tmp
+                mountPath: /tmp
+                readOnly: false
+            command:
+              - node
+              - index.js
+              - --job=TRXS_UPLOAD
+              - --
+              - /bo-cron/config/config.json
+              - /bo-cron/secret
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              allowPrivilegeEscalation: false
+          volumes:
+            - name: config
+              secret:
+                secretName: db-config-prod
+            - name: secret
+              secret:
+                secretName: bo-cron-prod-secrets
+            - name: tmp
+              emptyDir: {}
+          restartPolicy: Never
+  concurrencyPolicy: Forbid

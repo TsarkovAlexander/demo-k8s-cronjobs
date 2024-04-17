@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-replace
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Replace
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cronjob-replace
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo "Hello World!"; sleep 140
+          restartPolicy: OnFailure
